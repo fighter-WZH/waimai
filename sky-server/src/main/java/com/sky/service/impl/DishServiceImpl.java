@@ -6,14 +6,13 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Employee;
 import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorsMapper;
 import com.sky.dto.DishDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
 import com.sky.mapper.DishMapper;
-import com.sky.mapper.setmealDishMapper;
+import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
@@ -36,7 +35,7 @@ public class DishServiceImpl implements DishService {
     private DishFlavorsMapper dishFlavorsMapper;
 
     @Autowired
-    private setmealDishMapper setmealDishMapper;
+    private SetmealDishMapper setmealDishMapper;
 
     /**
      * 新增菜品
@@ -175,5 +174,16 @@ public class DishServiceImpl implements DishService {
                 .updateUser(BaseContext.getCurrentId())
                 .build();
         dishMapper.update(dish);
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<DishVO> list(Long categoryId) {
+        List<DishVO> list = dishMapper.list(categoryId);
+        return list;
     }
 }
