@@ -54,8 +54,8 @@ sky:
     endpoint: ${sky.alioss.endpoint}
 
     wechat:
-      app-id: ${sky.wechat.app-id}
-      app-secret: ${sky.wechat.app-secret}
+      app-id: ${sky.wechat.app-id}//小程序appid
+      app-secret: ${sky.wechat.app-secret}//小程序appsecret
 
 
 
