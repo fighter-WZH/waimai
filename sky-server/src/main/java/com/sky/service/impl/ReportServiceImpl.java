@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -137,9 +138,16 @@ public class ReportServiceImpl implements ReportService {
             Integer validOrderCount = orderMapper.getOrderCount(beginTime, endTime, Orders.COMPLETED);
             validOrderCountList.add(validOrderCount);
         }
-        Integer totalOrderCount = orderMapper.getOrderCount(null, null, null);
-        Integer validOrderCount = orderMapper.getOrderCount(null, null, Orders.COMPLETED);
-        double orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
+//        Integer totalOrderCount = orderMapper.getOrderCount(null, null, null);
+//        Integer validOrderCount = orderMapper.getOrderCount(null, null, Orders.COMPLETED);
+        Integer totalOrderCount = orderCountList.stream().reduce(Integer::sum).get();
+        Integer validOrderCount = validOrderCountList.stream().reduce(Integer::sum).get();
+
+        double orderCompletionRate = 0.0;
+        if(totalOrderCount != 0){
+            orderCompletionRate = validOrderCount.doubleValue() / totalOrderCount;
+
+        }
 
         return OrderReportVO.builder()
                 .dateList(StringUtils.join(dateList, ","))
@@ -160,12 +168,14 @@ public class ReportServiceImpl implements ReportService {
         LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
         LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
         List <GoodsSalesDTO> list = orderMapper.getTop10(beginTime, endTime);
-        List<String> nameList = new ArrayList<>();
-        List<Integer> numberList = new ArrayList<>();
-        for (GoodsSalesDTO goodsSalesDTO : list) {
-            nameList.add(goodsSalesDTO.getName());
-            numberList.add(goodsSalesDTO.getNumber());
-        }
+        List<String> nameList = list.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        List<Integer> numberList = list.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+//        List<String> nameList = new ArrayList<>();
+//        List<Integer> numberList = new ArrayList<>();
+//        for (GoodsSalesDTO goodsSalesDTO : list) {
+//            nameList.add(goodsSalesDTO.getName());
+//            numberList.add(goodsSalesDTO.getNumber());
+//        }
         return SalesTop10ReportVO.builder()
                 .nameList(StringUtils.join(nameList, ","))
                 .numberList(StringUtils.join(numberList, ","))
