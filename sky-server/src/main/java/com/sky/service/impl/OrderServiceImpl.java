@@ -1,7 +1,9 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.WebSocket.WebSocketServer;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.*;
@@ -28,7 +30,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -53,6 +57,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -136,6 +143,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        //通过WebSocket推送消息
+        Map map = new HashMap();
+        map.put("type", 1);//1表示来订单消息2表示用户催单
+        map.put("orderId", ordersDB.getId());//订单id
+        map.put("content", "订单号："+ordersPaymentDTO.getOrderNumber());
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
+
 
 
         OrderPaymentVO orderPaymentVO = new OrderPaymentVO();
@@ -350,6 +366,24 @@ public class OrderServiceImpl implements OrderService {
                 .deliveryTime(LocalDateTime.now())
                 .build();
         orderMapper.update(orders);
+    }
+
+    /**
+     * 催单
+     * @param id
+     */
+    public void reminder(Long id) {
+
+        Orders ordersDB = orderMapper.getById(id);
+
+        //通过WebSocket推送消息
+        Map map = new HashMap();
+        map.put("type", 2);//1表示来订单消息2表示用户催单
+        map.put("orderId", id);//订单id
+        map.put("content", "订单号："+ ordersDB.getNumber());
+
+        String json = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
 
