@@ -43,7 +43,7 @@ public interface UserMapper {
      * @return
      */
     @Select("select count(id) from user where create_time between #{beginTime} and #{endTime}")
-    Double sumNewUser(LocalDateTime beginTime, LocalDateTime endTime);
+    Integer sumNewUser(LocalDateTime beginTime, LocalDateTime endTime);
 
     /**
      * 根据时间统计总用户数量
@@ -51,5 +51,6 @@ public interface UserMapper {
      * @return
      */
     @Select("select count(id) from user where create_time <= #{endTime}")
-    Double sumTotalUser(LocalDateTime endTime);
+    Integer sumTotalUser(LocalDateTime endTime);
+
 }
